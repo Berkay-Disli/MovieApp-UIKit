@@ -7,8 +7,12 @@
 
 import UIKit
 
+enum Sections: Int {
+    case trendingMovies, trendingTv, populars, upcoming, topRated
+}
+
 class HomeViewController: UIViewController {
-    let sectionTitles = ["Trending Movies", "Trending TV", "Popular", "Upcoming Movies", "Top Rated"]
+    let sectionTitles = ["Trendıng Movıes", "Trendıng TV", "Popular", "Upcomıng Movıes", "Top Rated"]
     
     private let homeFeedTable: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
@@ -96,6 +100,31 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CollectionViewTableViewCell.identifier, for: indexPath) as? CollectionViewTableViewCell else { return UITableViewCell() }
+        
+        switch indexPath.section {
+        case Sections.trendingMovies.rawValue:
+            APICaller.shared.getTrendingMovies { response in
+                cell.configure(with: response.results)
+            }
+        case Sections.trendingTv.rawValue:
+            APICaller.shared.getTrendingTVs { response in
+                cell.configure(with: response.results)
+            }
+        case Sections.populars.rawValue:
+            APICaller.shared.getPopular { response in
+                cell.configure(with: response.results)
+            }
+        case Sections.upcoming.rawValue:
+            APICaller.shared.getUpcomingMovies { response in
+                cell.configure(with: response.results)
+            }
+        case Sections.topRated.rawValue:
+            APICaller.shared.getTopRated { response in
+                cell.configure(with: response.results)
+            }
+        default:
+            return UITableViewCell()
+        }
         
         return cell
     }
