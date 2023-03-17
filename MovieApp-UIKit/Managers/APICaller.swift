@@ -103,4 +103,40 @@ class APICaller {
         
         task.resume()
     }
+    
+    func getDiscoverMovies(completion: @escaping (TrendingTitleResponse) -> Void) {
+        // https://api.themoviedb.org/3/discover/movie?api_key=<<api_key>>&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate
+        guard let url = URL(string: "\(Constants.baseURL)/3/discover/movie?api_key=\(Constants.API_KEY)&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate") else { return }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data, error == nil else { return }
+            
+            do {
+                let topRateds = try JSONDecoder().decode(TrendingTitleResponse.self, from: data)
+                completion(topRateds)
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
+        task.resume()
+    }
+    
+    func search(with query: String, completion: @escaping (TrendingTitleResponse) -> Void) {
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        guard let url = URL(string: "\(Constants.baseURL)/3/search/movie?api_key=\(Constants.API_KEY)&query=\(query)") else { return }
+        
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data, error == nil else { return }
+            
+            do {
+                let topRateds = try JSONDecoder().decode(TrendingTitleResponse.self, from: data)
+                completion(topRateds)
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
+        task.resume()
+    }
 }
